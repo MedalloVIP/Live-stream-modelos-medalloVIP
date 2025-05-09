@@ -1,4 +1,5 @@
 import { connect, createLocalTracks } from "https://cdn.skypack.dev/livekit-client";
+import { mostrarResolucion } from "./resolucion-control.js";
 
 const tokenUrl = "https://backend-livekit-medallovip.vercel.app/get-token";
 const roomName = "sala1";
@@ -53,13 +54,11 @@ async function iniciarTransmision() {
     audioTrack = tracks.find(t => t.kind === "audio");
     videoTrack = tracks.find(t => t.kind === "video");
 
-    room = await connect("wss://medallovip-zxlixdwt.livekit.cloud", data.token, {
-      tracks,
-    });
+    room = await connect("wss://medallovip-zxlixdwt.livekit.cloud", data.token, { tracks });
 
     if (videoTrack) {
       videoTrack.attach(videoElement);
-      mostrarResolucion(videoTrack);
+      mostrarResolucion(videoTrack);  // función externa importada
     }
 
     mostrarVelocidad();
@@ -86,13 +85,6 @@ function detenerTransmision() {
     status.style.color = "#aaaaaa";
     btnTransmit.textContent = "Iniciar Transmisión";
     isTransmitting = false;
-  }
-}
-
-function mostrarResolucion(videoTrack) {
-  const settings = videoTrack.mediaStreamTrack.getSettings();
-  if (settings.width && settings.height) {
-    resolution.textContent = `Resolución: ${settings.width}x${settings.height}`;
   }
 }
 
