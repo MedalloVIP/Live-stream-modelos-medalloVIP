@@ -1,19 +1,22 @@
-// firebase-config.js
+// Importa las funciones necesarias de los SDKs de Firebase
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getDatabase } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
+// Configuración de tu proyecto Firebase
 const firebaseConfig = {
-  apiKey: "AIzaSyDYlUKvUgStllAf8piIypRjHd6Wizx9_AQ",
+  apiKey: "AIzaSyD7pcnepnqnTng3e88Wr_XcGGc6GDKlTU4",
   authDomain: "medallovip-bae9f.firebaseapp.com",
   databaseURL: "https://medallovip-bae9f-default-rtdb.firebaseio.com",
   projectId: "medallovip-bae9f",
   storageBucket: "medallovip-bae9f.appspot.com",
-  messagingSenderId: "121043183852",
-  appId: "1:121043183852:web:f7708f45ff01e2404c0c2f",
-  measurementId: "G-ZH9C1H94R4"
+  messagingSenderId: "97246331560",
+  appId: "1:97246531560:web:64be84a8c9dece26741e5d"
+  measurementId: "G-BCLXS4R2B3"
 };
 
+// Inicializa Firebase
 const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
+const database = getDatabase(app);
 
-console.log("Firebase App inicializado correctamente");
+// Verificación en consola
+console.log("Firebase inicializado correctamente");
