@@ -20,3 +20,4 @@ const database = getDatabase(app);
 
 // Verificación en consola
 console.log("Firebase inicializado correctamente");
+export { app };
