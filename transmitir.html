@@ -18,8 +18,7 @@
     }
     h1 { color: #00ffff; margin-bottom: 20px; }
     video {
-      width: 80%;
-      max-width: 720px;
+      width: 80%; max-width: 720px;
       border: 3px solid #00ffff;
       border-radius: 10px;
     }
@@ -30,8 +29,8 @@
       color: #aaaaaa;
     }
     button {
-      margin-top: 15px;
-      padding: 10px 20px;
+      margin-top: 20px;
+      padding: 12px 24px;
       background: #00ffff;
       border: none;
       border-radius: 8px;
@@ -39,19 +38,15 @@
       color: black;
       cursor: pointer;
     }
-    #micBtn {
-      background: #ff00ff;
-    }
   </style>
 </head>
 <body>
   <h1>Transmitiendo en Vivo (Modelo)</h1>
-  <video id="videoElement" autoplay playsinline></video>
+  <video id="videoElement" autoplay muted playsinline></video>
   <div id="status">Esperando iniciar...</div>
   <div id="resolucion">Resolución: --</div>
   <div id="velocidad">Velocidad: --</div>
   <button id="startBtn">Iniciar Transmisión</button>
-  <button id="micBtn">Silenciar Micrófono</button>
 
   <script type="module" src="./livekit-config.js"></script>
 </body>
