@@ -107,8 +107,10 @@
     <button onclick="sendMessage()">Enviar</button>
   </div>
 
+  <!-- Firebase -->
   <script type="module" src="./firebase-config.js"></script>
 
+  <!-- Chat -->
   <script type="module">
     import { getDatabase, ref, push, onChildAdded } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
     import { app } from "./firebase-config.js";
@@ -136,16 +138,16 @@
     };
   </script>
 
+  <!-- LiveKit Video Viewer -->
   <script type="module">
     import { connect } from "https://cdn.skypack.dev/livekit-client";
 
-    const url = "wss://medallovip-zxlixdwt.livekit.cloud";
-    const tokenUrl = "https://live-stream-modelos-medallo-vip.vercel.app/get-token";
+    const videoElement = document.getElementById("videoElement");
+    const roomName = "sala1";
+    const identity = "viewer_" + Math.floor(Math.random() * 100000);
+    const tokenUrl = "https://backend-livekit-medallovip.vercel.app/get-token";
 
-    async function connectToLiveKit() {
-      const roomName = "sala1";
-      const identity = "usuario_" + Math.floor(Math.random() * 10000);
-
+    async function iniciarLiveKit() {
       const res = await fetch(tokenUrl, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -153,9 +155,11 @@
       });
 
       const data = await res.json();
-      const room = await connect(url, data.token, { video: false, audio: true });
 
-      const videoElement = document.getElementById("videoElement");
+      const room = await connect("wss://medallovip-zxlixdwt.livekit.cloud", data.token, {
+        video: true,
+        audio: true,
+      });
 
       room.on("trackSubscribed", (track, publication, participant) => {
         if (track.kind === "video") {
@@ -164,7 +168,7 @@
       });
     }
 
-    connectToLiveKit();
+    iniciarLiveKit();
   </script>
 </body>
 </html>
