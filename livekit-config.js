@@ -11,7 +11,7 @@ const roomName = "sala1";
 const identity = "modelo_" + Math.floor(Math.random() * 100000);
 
 let room = null;
-let mediaStream = null;
+let localStream = null;
 let isTransmitting = false;
 
 btn.onclick = async () => {
@@ -28,6 +28,13 @@ async function iniciarTransmision() {
     status.style.color = "#ffaa00";
     btn.disabled = true;
 
+    localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+    videoElement.srcObject = localStream;
+
+    const trackSettings = localStream.getVideoTracks()[0].getSettings();
+    resolucion.textContent = `Resolución: ${trackSettings.width}x${trackSettings.height}`;
+    monitorVelocidad();
+
     const res = await fetch(tokenUrl, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -38,33 +45,16 @@ async function iniciarTransmision() {
     if (!data.token) throw new Error("Token no recibido");
 
     const tracks = await createLocalTracks({ audio: true, video: true });
-
-    room = await connect("wss://medallovip-zxlixdwt.livekit.cloud", data.token, {
-      tracks,
-    });
-
-    // Adjuntar video
-    const videoTrack = tracks.find(t => t.kind === "video");
-    if (videoTrack) {
-      videoTrack.attach(videoElement);
-    }
-
-    // Obtener resolución real
-    mediaStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-    const settings = mediaStream.getVideoTracks()[0].getSettings();
-    resolucion.textContent = `Resolución: ${settings.width}x${settings.height}`;
-
-    // Monitorear velocidad estimada
-    monitorVelocidad();
+    room = await connect("wss://medallovip-zxlixdwt.livekit.cloud", data.token, { tracks });
 
     status.textContent = "¡Transmisión activa!";
     status.style.color = "#00ff00";
     btn.textContent = "Detener Transmisión";
     btn.disabled = false;
     isTransmitting = true;
-  } catch (err) {
-    console.error(err);
-    status.textContent = "Error: " + err.message;
+  } catch (error) {
+    console.error(error);
+    status.textContent = "Error: " + error.message;
     status.style.color = "#ff0033";
     btn.textContent = "Reintentar";
     btn.disabled = false;
@@ -74,19 +64,21 @@ async function iniciarTransmision() {
 function detenerTransmision() {
   if (room) {
     room.disconnect();
-    mediaStream?.getTracks().forEach(track => track.stop());
-    status.textContent = "Transmisión detenida";
-    status.style.color = "#ffffff";
-    btn.textContent = "Iniciar Transmisión";
-    isTransmitting = false;
   }
+  if (localStream) {
+    localStream.getTracks().forEach(t => t.stop());
+  }
+  status.textContent = "Transmisión detenida";
+  status.style.color = "#ffffff";
+  btn.textContent = "Iniciar Transmisión";
+  isTransmitting = false;
 }
 
 function monitorVelocidad() {
   setInterval(() => {
-    const downlink = navigator.connection?.downlink;
-    if (downlink) {
-      velocidad.textContent = `Velocidad estimada: ${downlink.toFixed(2)} Mbps`;
+    const net = navigator.connection;
+    if (net && net.downlink) {
+      velocidad.textContent = `Velocidad estimada: ${net.downlink.toFixed(2)} Mbps`;
     }
-  }, 3000);
+  }, 2000);
 }
