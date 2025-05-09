@@ -3,25 +3,168 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Ver Transmisión</title>
-  <script src="https://unpkg.com/@livekit/client/dist/livekit-client.min.js"></script>
+  <title>Ver Transmisión en Vivo</title>
+  <style>
+    body {
+      margin: 0;
+      background-color: black;
+      font-family: 'Segoe UI', sans-serif;
+      color: white;
+      display: flex;
+      flex-direction: row;
+      height: 100vh;
+    }
+
+    .video-container {
+      flex: 2;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .chat-container {
+      flex: 1;
+      border-left: 2px solid #00ffff;
+      background-color: #111;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    h2 {
+      color: #00ffff;
+      margin-bottom: 10px;
+      text-align: center;
+    }
+
+    #chat-box {
+      flex: 1;
+      overflow-y: auto;
+      background-color: #222;
+      padding: 10px;
+      border-radius: 10px;
+      margin-bottom: 10px;
+      border: 2px solid #ff00ff;
+    }
+
+    .message {
+      background-color: #333;
+      padding: 8px 12px;
+      border-radius: 8px;
+      margin-bottom: 8px;
+      box-shadow: 0 0 5px #00ffff77;
+    }
+
+    .username {
+      font-weight: bold;
+      color: #ff00ff;
+    }
+
+    input, button {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      font-size: 14px;
+      border-radius: 6px;
+      border: none;
+      outline: none;
+    }
+
+    input {
+      background: #222;
+      color: white;
+      border: 1px solid #00ffff;
+    }
+
+    button {
+      background-color: #00ffff;
+      color: black;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #00cccc;
+    }
+
+    video {
+      width: 100%;
+      border-radius: 10px;
+      border: 3px solid #00ffff;
+    }
+  </style>
 </head>
-<body style="background-color:black; color:white; text-align:center;">
-  <h1>Ver Transmisión en Vivo</h1>
-  <video id="videoElement" autoplay playsinline style="width:80%; border:2px solid #00ffff; border-radius:16px;"></video>
+<body>
+  <div class="video-container">
+    <video id="videoElement" autoplay playsinline></video>
+  </div>
+  <div class="chat-container">
+    <h2>Chat en Vivo</h2>
+    <div id="chat-box"></div>
+    <input type="text" id="username" placeholder="Tu nombre" />
+    <input type="text" id="message" placeholder="Escribe tu mensaje" />
+    <button onclick="sendMessage()">Enviar</button>
+  </div>
+
+  <script type="module" src="./firebase-config.js"></script>
+
+  <script type="module">
+    import { getDatabase, ref, push, onChildAdded } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+    import { app } from "./firebase-config.js";
+
+    const db = getDatabase(app);
+    const messagesRef = ref(db, "mensajes");
+    const chatBox = document.getElementById("chat-box");
+
+    onChildAdded(messagesRef, (data) => {
+      const msg = data.val();
+      const div = document.createElement("div");
+      div.className = "message";
+      div.innerHTML = `<span class="username">${msg.name}</span>: ${msg.text}`;
+      chatBox.appendChild(div);
+      chatBox.scrollTop = chatBox.scrollHeight;
+    });
+
+    window.sendMessage = function () {
+      const name = document.getElementById("username").value.trim();
+      const text = document.getElementById("message").value.trim();
+      if (name && text) {
+        push(messagesRef, { name, text });
+        document.getElementById("message").value = "";
+      }
+    };
+  </script>
+
   <script type="module">
     import { connect } from "https://cdn.skypack.dev/livekit-client";
+
     const url = "wss://medallovip-zxlixdwt.livekit.cloud";
-    const token = "AQUÍ_VA_EL_TOKEN_GENERADO_EN_EL_BACKEND";
-    async function startLiveKit() {
-      const room = await connect(url, token);
-      room.on('trackSubscribed', (track) => {
-        if (track.kind === 'video') {
-          track.attach(document.getElementById("videoElement"));
+    const tokenUrl = "https://live-stream-modelos-medallo-vip.vercel.app/get-token";
+
+    async function connectToLiveKit() {
+      const roomName = "sala1";
+      const identity = "usuario_" + Math.floor(Math.random() * 10000);
+
+      const res = await fetch(tokenUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ roomName, identity }),
+      });
+
+      const data = await res.json();
+      const room = await connect(url, data.token, { video: false, audio: true });
+
+      const videoElement = document.getElementById("videoElement");
+
+      room.on("trackSubscribed", (track, publication, participant) => {
+        if (track.kind === "video") {
+          track.attach(videoElement);
         }
       });
     }
-    startLiveKit();
+
+    connectToLiveKit();
   </script>
 </body>
 </html>
