@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Prueba de Cámara y Micrófono</title>
+  <style>
+    body {
+      background-color: black;
+      color: white;
+      font-family: 'Segoe UI', sans-serif;
+      text-align: center;
+      padding: 40px;
+    }
+    h1 {
+      color: #00ffff;
+      margin-bottom: 20px;
+    }
+    video {
+      width: 90%;
+      max-width: 720px;
+      border: 3px solid #00ffff;
+      border-radius: 12px;
+    }
+    #status {
+      margin-top: 20px;
+      color: #ff00ff;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <h1>Prueba de Cámara y Micrófono</h1>
+  <video id="preview" autoplay playsinline muted></video>
+  <p id="status">Esperando permisos...</p>
+
+  <script>
+    const video = document.getElementById("preview");
+    const status = document.getElementById("status");
+
+    async function iniciarPrueba() {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+        video.srcObject = stream;
+        status.textContent = "Cámara y micrófono activos correctamente.";
+        status.style.color = "#00ff00";
+      } catch (err) {
+        status.textContent = "Error al acceder a cámara o micrófono: " + err.message;
+        status.style.color = "#ff0000";
+        console.error(err);
+      }
+    }
+
+    iniciarPrueba();
+  </script>
+</body>
+</html>
