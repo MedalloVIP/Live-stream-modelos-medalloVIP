@@ -6,7 +6,7 @@
   <title>Transmitir en Vivo (Modelo)</title>
   <style>
     body {
-      background-color: black;
+      background: black;
       color: white;
       font-family: 'Segoe UI', sans-serif;
       display: flex;
@@ -14,79 +14,56 @@
       align-items: center;
       justify-content: center;
       height: 100vh;
+      margin: 0;
     }
-
     h1 {
       color: #00ffff;
+      margin-bottom: 20px;
     }
-
     video {
       width: 80%;
       max-width: 720px;
       border: 3px solid #00ffff;
-      border-radius: 12px;
-      margin-top: 20px;
+      border-radius: 10px;
     }
-
     #status {
-      margin: 15px;
-      font-weight: bold;
+      margin-top: 15px;
       color: #ff00ff;
+      font-weight: bold;
     }
-
     button {
-      background-color: #00ffff;
-      color: black;
-      padding: 12px 24px;
+      margin-top: 15px;
+      padding: 10px 20px;
+      background: #00ffff;
       border: none;
       border-radius: 8px;
       font-weight: bold;
+      color: black;
       cursor: pointer;
-      margin-top: 15px;
     }
   </style>
 </head>
 <body>
   <h1>Transmitiendo en Vivo (Modelo)</h1>
-  <video id="videoElement" autoplay playsinline muted></video>
-  <div id="status">Esperando permisos...</div>
+  <video id="videoElement" autoplay muted playsinline></video>
+  <div id="status">Esperando iniciar...</div>
   <button id="startBtn">Iniciar Transmisión</button>
 
   <script type="module">
     import { connect, createLocalTracks } from "https://cdn.skypack.dev/livekit-client";
 
+    const tokenUrl = "https://backend-livekit-medallovip.vercel.app/get-token";
+    const roomName = "sala1";
+    const identity = "modelo_" + Math.floor(Math.random() * 10000);
     const videoElement = document.getElementById("videoElement");
     const status = document.getElementById("status");
     const btn = document.getElementById("startBtn");
 
-    const roomName = "sala1";
-    const identity = "modelo_" + Math.floor(Math.random() * 10000);
-    const tokenUrl = "https://backend-livekit-medallovip.vercel.app/get-token";
+    let room = null;
 
-    let tracks = [];
-
-    // PRUEBA de cámara y micrófono primero
-    async function verificarDispositivos() {
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-        videoElement.srcObject = stream;
-        status.textContent = "Cámara y micrófono activos";
-        btn.disabled = false;
-      } catch (err) {
-        status.textContent = "Error al acceder: " + err.message;
-        btn.disabled = true;
-      }
-    }
-
-    verificarDispositivos();
-
-    // Conexión a LiveKit
     btn.onclick = async () => {
       try {
-        btn.disabled = true;
-        status.textContent = "Conectando a LiveKit...";
-
-        tracks = await createLocalTracks({ video: true, audio: true });
+        status.textContent = "Solicitando acceso...";
 
         const res = await fetch(tokenUrl, {
           method: "POST",
@@ -95,17 +72,21 @@
         });
 
         const data = await res.json();
-        const room = await connect("wss://medallovip-zxlixdwt.livekit.cloud", data.token, { tracks });
+        if (!data.token) throw new Error("Token no recibido");
 
-        // Reemplazar previsualización con el track real
-        videoElement.srcObject = null;
-        tracks.find(t => t.kind === "video")?.attach(videoElement);
+        const tracks = await createLocalTracks({ audio: true, video: true });
 
-        status.textContent = "¡Transmisión en vivo activa!";
-      } catch (error) {
-        status.textContent = "Error: " + error.message;
-        console.error(error);
-        btn.disabled = false;
+        room = await connect("wss://medallovip-zxlixdwt.livekit.cloud", data.token, { tracks });
+
+        const videoTrack = tracks.find(t => t.kind === "video");
+        if (videoTrack) videoTrack.attach(videoElement);
+
+        status.textContent = "¡Transmisión activa!";
+        status.style.color = "#00ff00";
+      } catch (err) {
+        console.error(err);
+        status.textContent = "Error: " + err.message;
+        status.style.color = "#ff0000";
       }
     };
   </script>
