@@ -1,36 +1,24 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Transmitir en Vivo (Modelo)</title>
+  <title>Transmitir en Vivo</title>
   <style>
     body {
-      margin: 0;
-      background-color: black;
-      font-family: 'Segoe UI', sans-serif;
-      color: white;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
+      background: black; color: white; font-family: 'Segoe UI', sans-serif;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      height: 100vh; margin: 0;
     }
-    h1 { color: #00ffff; margin-bottom: 20px; }
+    h1 { color: #00ffff; margin-bottom: 10px; }
     video {
       width: 80%; max-width: 720px;
-      border: 3px solid #00ffff; border-radius: 10px;
+      border: 3px solid #00ffff; border-radius: 12px; margin-bottom: 15px;
     }
-    #status { margin-top: 20px; font-weight: bold; color: #ff00ff; }
+    #status { color: #ff00ff; margin-bottom: 10px; font-weight: bold; }
     button {
-      margin-top: 20px;
-      background-color: #00ffff;
-      border: none;
-      border-radius: 8px;
-      padding: 12px 24px;
-      font-weight: bold;
-      cursor: pointer;
+      background: #00ffff; color: black; border: none; padding: 12px 20px;
+      border-radius: 8px; font-weight: bold; cursor: pointer;
     }
   </style>
 </head>
@@ -41,44 +29,29 @@
   <button id="startBtn">Iniciar Transmisión</button>
 
   <script type="module">
-    import { connect, Room } from "https://cdn.skypack.dev/livekit-client";
-
-    const roomName = "sala1";
-    const identity = "modelo_" + Math.floor(Math.random() * 10000);
+    import { connect } from "https://cdn.skypack.dev/livekit-client";
     const tokenUrl = "https://backend-livekit-medallovip.vercel.app/get-token";
-    const videoElement = document.getElementById("videoElement");
-    const status = document.getElementById("status");
-    const button = document.getElementById("startBtn");
-
-    button.onclick = async () => {
+    const roomName = "sala1";
+    const identity = "modelo_" + Math.floor(Math.random() * 100000);
+    const videoEl = document.getElementById("videoElement");
+    const statusEl = document.getElementById("status");
+    document.getElementById("startBtn").onclick = async () => {
       try {
-        // Solicitar cámara y micrófono primero
-        const mediaStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-        videoElement.srcObject = mediaStream;
-
+        const media = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+        videoEl.srcObject = media;
+        statusEl.textContent = "Solicitando token...";
         const res = await fetch(tokenUrl, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ roomName, identity }),
+          method: "POST", headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ roomName, identity })
         });
-
-        const data = await res.json();
-        if (!data.token) throw new Error("Token no recibido");
-
-        const room = await connect("wss://medallovip-zxlixdwt.livekit.cloud", data.token, {
-          audio: true,
-          video: true,
-        });
-
-        room.localParticipant.videoTracks.forEach(pub => {
-          const track = pub.track;
-          track.attach(videoElement);
-        });
-
-        status.textContent = "¡Transmisión activa!";
-      } catch (err) {
-        console.error(err);
-        status.textContent = "Error: " + err.message;
+        const { token } = await res.json();
+        if (!token) throw new Error("Token no recibido");
+        const room = await connect("wss://medallovip-zxlixdwt.livekit.cloud", token, { audio: true, video: true });
+        room.localParticipant.videoTracks.forEach(pub => pub.track.attach(videoEl));
+        statusEl.textContent = "¡Transmisión activa!";
+      } catch (e) {
+        console.error(e);
+        statusEl.textContent = "Error: " + e.message;
       }
     };
   </script>
