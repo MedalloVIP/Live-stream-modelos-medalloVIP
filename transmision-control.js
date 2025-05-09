@@ -14,7 +14,8 @@ const btnMic = document.getElementById("micBtn");
 let room = null;
 let micEnabled = true;
 let isTransmitting = false;
-let audioTrack, videoTrack;
+let audioTrack = null;
+let videoTrack = null;
 
 btnTransmit.onclick = async () => {
   if (!isTransmitting) {
@@ -56,9 +57,11 @@ async function iniciarTransmision() {
       tracks,
     });
 
-    if (videoTrack) videoTrack.attach(videoElement);
+    if (videoTrack) {
+      videoTrack.attach(videoElement);
+      mostrarResolucion(videoTrack);
+    }
 
-    mostrarResolucion(videoTrack);
     mostrarVelocidad();
 
     status.textContent = "¡Transmisión activa!";
@@ -67,6 +70,7 @@ async function iniciarTransmision() {
     btnTransmit.disabled = false;
     isTransmitting = true;
   } catch (error) {
+    console.error(error);
     status.textContent = "Error: " + error.message;
     status.style.color = "#ff0033";
     btnTransmit.textContent = "Reintentar";
@@ -77,8 +81,9 @@ async function iniciarTransmision() {
 function detenerTransmision() {
   if (room) {
     room.disconnect();
+    if (videoTrack) videoTrack.detach();
     status.textContent = "Transmisión detenida";
-    status.style.color = "#ffffff";
+    status.style.color = "#aaaaaa";
     btnTransmit.textContent = "Iniciar Transmisión";
     isTransmitting = false;
   }
@@ -86,7 +91,9 @@ function detenerTransmision() {
 
 function mostrarResolucion(videoTrack) {
   const settings = videoTrack.mediaStreamTrack.getSettings();
-  resolution.textContent = `Resolución: ${settings.width}x${settings.height}`;
+  if (settings.width && settings.height) {
+    resolution.textContent = `Resolución: ${settings.width}x${settings.height}`;
+  }
 }
 
 function mostrarVelocidad() {
@@ -94,5 +101,5 @@ function mostrarVelocidad() {
     if (navigator.connection) {
       speed.textContent = `Velocidad: ${navigator.connection.downlink.toFixed(1)} Mbps`;
     }
-  }, 2000);
+  }, 3000);
 }
