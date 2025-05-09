@@ -14,7 +14,8 @@ const btnMic = document.getElementById("micBtn");
 let room = null;
 let micEnabled = true;
 let isTransmitting = false;
-let audioTrack, videoTrack;
+let audioTrack = null;
+let videoTrack = null;
 
 btnTransmit.onclick = async () => {
   if (!isTransmitting) {
@@ -27,7 +28,7 @@ btnTransmit.onclick = async () => {
 btnMic.onclick = () => {
   if (audioTrack) {
     micEnabled = !micEnabled;
-    audioTrack.muted = !micEnabled;
+    audioTrack.mediaStreamTrack.enabled = micEnabled;
     btnMic.textContent = micEnabled ? "Silenciar Micrófono" : "Activar Micrófono";
     btnMic.style.backgroundColor = micEnabled ? "#ff00ff" : "#ff3333";
   }
@@ -35,7 +36,8 @@ btnMic.onclick = () => {
 
 async function iniciarTransmision() {
   try {
-    cambiarEstado("Conectando...", "#ffaa00");
+    status.textContent = "Conectando...";
+    status.style.color = "#ffaa00";
     btnTransmit.disabled = true;
 
     const res = await fetch(tokenUrl, {
@@ -58,14 +60,17 @@ async function iniciarTransmision() {
     if (videoTrack) videoTrack.attach(videoElement);
 
     mostrarResolucion(videoTrack);
-    monitorVelocidad();
+    mostrarVelocidad();
 
-    cambiarEstado("¡Transmisión activa!", "#00ff00");
+    status.textContent = "¡Transmisión activa!";
+    status.style.color = "#00ff00";
     btnTransmit.textContent = "Detener Transmisión";
     btnTransmit.disabled = false;
     isTransmitting = true;
   } catch (error) {
-    cambiarEstado("Error: " + error.message, "#ff0033");
+    console.error(error);
+    status.textContent = "Error: " + error.message;
+    status.style.color = "#ff0033";
     btnTransmit.textContent = "Reintentar";
     btnTransmit.disabled = false;
   }
@@ -74,15 +79,11 @@ async function iniciarTransmision() {
 function detenerTransmision() {
   if (room) {
     room.disconnect();
-    cambiarEstado("Transmisión detenida", "#888888");
+    status.textContent = "Transmisión detenida";
+    status.style.color = "#ffffff";
     btnTransmit.textContent = "Iniciar Transmisión";
     isTransmitting = false;
   }
-}
-
-function cambiarEstado(texto, color) {
-  status.textContent = texto;
-  status.style.color = color;
 }
 
 function mostrarResolucion(videoTrack) {
@@ -90,7 +91,7 @@ function mostrarResolucion(videoTrack) {
   resolution.textContent = `Resolución: ${settings.width}x${settings.height}`;
 }
 
-function monitorVelocidad() {
+function mostrarVelocidad() {
   setInterval(() => {
     if (navigator.connection) {
       speed.textContent = `Velocidad: ${navigator.connection.downlink.toFixed(1)} Mbps`;
