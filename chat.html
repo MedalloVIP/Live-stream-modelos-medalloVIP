@@ -3,62 +3,113 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Chat en Vivo</title>
+  <title>Chat en Vivo - MedalloVIP</title>
   <style>
     body {
+      margin: 0;
+      padding: 0;
       background-color: black;
+      font-family: 'Segoe UI', sans-serif;
       color: white;
-      font-family: Arial, sans-serif;
+    }
+
+    .chat-container {
+      max-width: 600px;
+      margin: auto;
       padding: 20px;
     }
+
+    h2 {
+      text-align: center;
+      color: #00ffff;
+    }
+
     #chat-box {
-      height: 300px;
+      height: 400px;
       overflow-y: auto;
-      border: 2px solid #00ffff;
-      padding: 10px;
-      margin-bottom: 10px;
       background-color: #111;
+      border-radius: 10px;
+      padding: 15px;
+      border: 2px solid #ff00ff;
+      margin-bottom: 20px;
     }
-    #chat-box p {
-      margin: 4px 0;
+
+    .message {
+      margin: 10px 0;
+      padding: 10px 15px;
+      background-color: #222;
+      border-radius: 10px;
+      max-width: 80%;
+      word-wrap: break-word;
+      box-shadow: 0 0 10px #00ffff77;
     }
+
+    .username {
+      font-weight: bold;
+      color: #ff00ff;
+    }
+
     input, button {
-      padding: 10px;
-      margin-top: 5px;
+      width: 100%;
+      padding: 12px;
+      margin: 6px 0;
       font-size: 16px;
+      border-radius: 6px;
+      border: none;
+      outline: none;
+    }
+
+    input {
+      background: #222;
+      color: white;
+      border: 1px solid #00ffff;
+    }
+
+    button {
+      background-color: #00ffff;
+      color: black;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #00cccc;
     }
   </style>
 </head>
 <body>
-  <h2>Chat en Vivo - MedalloVIP</h2>
-  <div id="chat-box"></div>
-  <input type="text" id="username" placeholder="Tu nombre" />
-  <br />
-  <input type="text" id="message" placeholder="Escribe tu mensaje" />
-  <br />
-  <button onclick="sendMessage()">Enviar</button>
+  <div class="chat-container">
+    <h2>Chat en Vivo - MedalloVIP</h2>
+    <div id="chat-box"></div>
+    <input type="text" id="username" placeholder="Tu nombre (modelo o usuario)" />
+    <input type="text" id="message" placeholder="Escribe tu mensaje..." />
+    <button onclick="sendMessage()">Enviar</button>
+  </div>
 
+  <!-- Firebase config -->
   <script type="module" src="./firebase-config.js"></script>
+
+  <!-- Chat en tiempo real -->
   <script type="module">
     import { getDatabase, ref, push, onChildAdded } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
     import { app } from "./firebase-config.js";
 
     const db = getDatabase(app);
     const messagesRef = ref(db, "mensajes");
-
     const chatBox = document.getElementById("chat-box");
 
     onChildAdded(messagesRef, (data) => {
       const msg = data.val();
-      const p = document.createElement("p");
-      p.innerText = `${msg.name}: ${msg.text}`;
+      const p = document.createElement("div");
+      p.className = "message";
+      p.innerHTML = `<span class="username">${msg.name}</span>: ${msg.text}`;
       chatBox.appendChild(p);
       chatBox.scrollTop = chatBox.scrollHeight;
     });
 
     window.sendMessage = function () {
-      const name = document.getElementById("username").value;
-      const text = document.getElementById("message").value;
+      const name = document.getElementById("username").value.trim();
+      const text = document.getElementById("message").value.trim();
       if (name && text) {
         push(messagesRef, { name, text });
         document.getElementById("message").value = "";
