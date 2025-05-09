@@ -31,6 +31,11 @@
       color: #ff00ff;
       font-weight: bold;
     }
+    #resolucion, #velocidad {
+      margin-top: 5px;
+      font-size: 14px;
+      color: #aaaaaa;
+    }
     button {
       margin-top: 15px;
       padding: 10px 20px;
@@ -41,6 +46,9 @@
       color: black;
       cursor: pointer;
     }
+    #micBtn {
+      background: #ff00ff;
+    }
   </style>
 </head>
 <body>
@@ -48,47 +56,10 @@
   <video id="videoElement" autoplay muted playsinline></video>
   <div id="status">Esperando iniciar...</div>
   <button id="startBtn">Iniciar Transmisión</button>
+  <div id="resolucion">Resolución: --</div>
+  <div id="velocidad">Velocidad: --</div>
+  <button id="micBtn">Silenciar Micrófono</button>
 
-  <script type="module">
-    import { connect, createLocalTracks } from "https://cdn.skypack.dev/livekit-client";
-
-    const tokenUrl = "https://backend-livekit-medallovip.vercel.app/get-token";
-    const roomName = "sala1";
-    const identity = "modelo_" + Math.floor(Math.random() * 10000);
-    const videoElement = document.getElementById("videoElement");
-    const status = document.getElementById("status");
-    const btn = document.getElementById("startBtn");
-
-    let room = null;
-
-    btn.onclick = async () => {
-      try {
-        status.textContent = "Solicitando acceso...";
-
-        const res = await fetch(tokenUrl, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ roomName, identity }),
-        });
-
-        const data = await res.json();
-        if (!data.token) throw new Error("Token no recibido");
-
-        const tracks = await createLocalTracks({ audio: true, video: true });
-
-        room = await connect("wss://medallovip-zxlixdwt.livekit.cloud", data.token, { tracks });
-
-        const videoTrack = tracks.find(t => t.kind === "video");
-        if (videoTrack) videoTrack.attach(videoElement);
-
-        status.textContent = "¡Transmisión activa!";
-        status.style.color = "#00ff00";
-      } catch (err) {
-        console.error(err);
-        status.textContent = "Error: " + err.message;
-        status.style.color = "#ff0000";
-      }
-    };
-  </script>
+  <script type="module" src="./transmision-control.js"></script>
 </body>
 </html>
