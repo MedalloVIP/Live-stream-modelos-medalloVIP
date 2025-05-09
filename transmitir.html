@@ -6,38 +6,88 @@
   <title>Transmitir en Vivo (Modelo)</title>
   <style>
     body {
-      background: black; color: white; font-family: 'Segoe UI', sans-serif;
-      display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh;
+      background-color: black;
+      color: white;
+      font-family: 'Segoe UI', sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
     }
-    h1 { color: #00ffff; margin-bottom: 20px; }
-    video { width: 80%; max-width: 720px; border: 3px solid #00ffff; border-radius: 10px; }
-    #status { margin-top: 15px; color: #ff00ff; font-weight: bold; }
+
+    h1 {
+      color: #00ffff;
+    }
+
+    video {
+      width: 80%;
+      max-width: 720px;
+      border: 3px solid #00ffff;
+      border-radius: 12px;
+      margin-top: 20px;
+    }
+
+    #status {
+      margin: 15px;
+      font-weight: bold;
+      color: #ff00ff;
+    }
+
     button {
-      margin-top: 15px; padding: 10px 20px; background: #00ffff;
-      border: none; border-radius: 8px; font-weight: bold; color: black;
+      background-color: #00ffff;
+      color: black;
+      padding: 12px 24px;
+      border: none;
+      border-radius: 8px;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 15px;
     }
   </style>
 </head>
 <body>
   <h1>Transmitiendo en Vivo (Modelo)</h1>
-  <video id="videoElement" autoplay muted playsinline></video>
-  <div id="status">Esperando iniciar...</div>
+  <video id="videoElement" autoplay playsinline muted></video>
+  <div id="status">Esperando permisos...</div>
   <button id="startBtn">Iniciar Transmisión</button>
 
   <script type="module">
     import { connect, createLocalTracks } from "https://cdn.skypack.dev/livekit-client";
 
-    const tokenUrl = "https://backend-livekit-medallovip.vercel.app/get-token";
     const videoElement = document.getElementById("videoElement");
     const status = document.getElementById("status");
     const btn = document.getElementById("startBtn");
 
     const roomName = "sala1";
     const identity = "modelo_" + Math.floor(Math.random() * 10000);
+    const tokenUrl = "https://backend-livekit-medallovip.vercel.app/get-token";
 
+    let tracks = [];
+
+    // PRUEBA de cámara y micrófono primero
+    async function verificarDispositivos() {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+        videoElement.srcObject = stream;
+        status.textContent = "Cámara y micrófono activos";
+        btn.disabled = false;
+      } catch (err) {
+        status.textContent = "Error al acceder: " + err.message;
+        btn.disabled = true;
+      }
+    }
+
+    verificarDispositivos();
+
+    // Conexión a LiveKit
     btn.onclick = async () => {
       try {
-        status.textContent = "Solicitando acceso...";
+        btn.disabled = true;
+        status.textContent = "Conectando a LiveKit...";
+
+        tracks = await createLocalTracks({ video: true, audio: true });
+
         const res = await fetch(tokenUrl, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -45,18 +95,17 @@
         });
 
         const data = await res.json();
-        if (!data.token) throw new Error("No se recibió token");
-
-        const tracks = await createLocalTracks({ audio: true, video: true });
         const room = await connect("wss://medallovip-zxlixdwt.livekit.cloud", data.token, { tracks });
 
-        // Mostrar el video local
+        // Reemplazar previsualización con el track real
+        videoElement.srcObject = null;
         tracks.find(t => t.kind === "video")?.attach(videoElement);
 
-        status.textContent = "¡Transmisión activa!";
+        status.textContent = "¡Transmisión en vivo activa!";
       } catch (error) {
-        console.error(error);
         status.textContent = "Error: " + error.message;
+        console.error(error);
+        btn.disabled = false;
       }
     };
   </script>
