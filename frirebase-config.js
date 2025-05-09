@@ -1,21 +1,19 @@
 // firebase-config.js
-import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
-import { getDatabase } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-database.js";
-import { getAuth } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getDatabase } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
 const firebaseConfig = {
-  apiKey: "TU_API_KEY",
-  authDomain: "TU_AUTH_DOMAIN",
-  databaseURL: "TU_DATABASE_URL",
-  projectId: "TU_PROJECT_ID",
-  storageBucket: "TU_STORAGE_BUCKET",
-  messagingSenderId: "TU_MESSAGING_SENDER_ID",
-  appId: "TU_APP_ID",
-  measurementId: "TU_MEASUREMENT_ID"
+  apiKey: "AIzaSyDYlUKvUgStllAf8piIypRjHd6Wizx9_AQ",
+  authDomain: "medallovip-bae9f.firebaseapp.com",
+  databaseURL: "https://medallovip-bae9f-default-rtdb.firebaseio.com",
+  projectId: "medallovip-bae9f",
+  storageBucket: "medallovip-bae9f.appspot.com",
+  messagingSenderId: "121043183852",
+  appId: "1:121043183852:web:f7708f45ff01e2404c0c2f",
+  measurementId: "G-ZH9C1H94R4"
 };
 
 const app = initializeApp(firebaseConfig);
-const database = getDatabase(app);
-const auth = getAuth(app);
+const db = getDatabase(app);
 
-export { app, database, auth };
+console.log("Firebase App inicializado correctamente");
