@@ -1,9 +1,10 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Transmitir en Vivo - Debug</title>
+  <title>Transmitiendo en Vivo (Modelo)</title>
   <style>
     body {
       margin: 0;
@@ -16,30 +17,33 @@
       justify-content: center;
       height: 100vh;
     }
-    h1 { color: #00ffff; margin-bottom: 20px; }
+    h1 {
+      color: #00ffff;
+    }
     video {
       width: 80%;
       max-width: 720px;
       border: 3px solid #00ffff;
       border-radius: 10px;
+      margin-bottom: 16px;
     }
     #status {
-      margin-top: 20px;
-      font-weight: bold;
       color: #ff00ff;
+      margin: 8px;
     }
     button {
-      margin-top: 20px;
-      padding: 10px 20px;
-      font-size: 16px;
-      background: #00ffff;
+      background-color: #00ffff;
       border: none;
-      border-radius: 8px;
-      cursor: pointer;
+      border-radius: 10px;
       color: black;
+      padding: 12px 20px;
+      font-size: 16px;
       font-weight: bold;
+      cursor: pointer;
     }
-    button:hover { background: #00cccc; }
+    button:hover {
+      background-color: #00cccc;
+    }
   </style>
 </head>
 <body>
@@ -56,17 +60,17 @@
     const tokenUrl = "https://backend-livekit-medallovip.vercel.app/get-token";
     const videoElement = document.getElementById("videoElement");
     const status = document.getElementById("status");
+    const startBtn = document.getElementById("startBtn");
 
-    document.getElementById("startBtn").addEventListener("click", async () => {
+    startBtn.onclick = async () => {
       try {
-        status.textContent = "Solicitando permisos de cámara/micrófono...";
         const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
         videoElement.srcObject = stream;
 
         const res = await fetch(tokenUrl, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ roomName, identity }),
+          body: JSON.stringify({ roomName, identity })
         });
 
         const data = await res.json();
@@ -77,13 +81,17 @@
         });
 
         status.textContent = "¡Transmisión activa!";
-        console.log("Transmisión conectada con LiveKit");
 
-      } catch (error) {
-        console.error("Error al iniciar la transmisión:", error);
+        room.localParticipant.videoTracks.forEach(pub => {
+          const track = pub.track;
+          track.attach(videoElement);
+        });
+      } catch (err) {
+        console.error("Error al iniciar transmisión:", err);
         status.textContent = "Error al iniciar la transmisión.";
       }
-    });
+    };
   </script>
 </body>
 </html>
+
