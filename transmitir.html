@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Transmitir en Vivo</title>
+  <script src="https://unpkg.com/@livekit/client/dist/livekit-client.min.js"></script>
+</head>
+<body style="background-color:black; color:white; text-align:center;">
+  <h1>Transmitir en Vivo</h1>
+  <video id="videoElement" autoplay playsinline muted style="width:80%; border:2px solid #ff00ff; border-radius:16px;"></video>
+  <script type="module">
+    import { connect } from "https://cdn.skypack.dev/livekit-client";
+    const url = "wss://medallovip-zxlixdwt.livekit.cloud";
+    const token = "AQUÍ_VA_EL_TOKEN_GENERADO_EN_EL_BACKEND";
+    async function startLiveKit() {
+      const room = await connect(url, token, { video: true, audio: true });
+      const videoTrack = Array.from(room.localParticipant.videoTracks.values())[0]?.track;
+      if (videoTrack) {
+        videoTrack.attach(document.getElementById("videoElement"));
+      }
+    }
+    startLiveKit();
+  </script>
+</body>
+</html>
