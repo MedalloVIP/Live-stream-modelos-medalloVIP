@@ -14,8 +14,7 @@ const btnMic = document.getElementById("micBtn");
 let room = null;
 let micEnabled = true;
 let isTransmitting = false;
-let audioTrack = null;
-let videoTrack = null;
+let audioTrack, videoTrack;
 
 btnTransmit.onclick = async () => {
   if (!isTransmitting) {
@@ -28,7 +27,7 @@ btnTransmit.onclick = async () => {
 btnMic.onclick = () => {
   if (audioTrack) {
     micEnabled = !micEnabled;
-    audioTrack.mediaStreamTrack.enabled = micEnabled;
+    audioTrack.muted = !micEnabled;
     btnMic.textContent = micEnabled ? "Silenciar Micrófono" : "Activar Micrófono";
     btnMic.style.backgroundColor = micEnabled ? "#ff00ff" : "#ff3333";
   }
@@ -68,7 +67,6 @@ async function iniciarTransmision() {
     btnTransmit.disabled = false;
     isTransmitting = true;
   } catch (error) {
-    console.error(error);
     status.textContent = "Error: " + error.message;
     status.style.color = "#ff0033";
     btnTransmit.textContent = "Reintentar";
