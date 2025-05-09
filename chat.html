@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Chat en Vivo</title>
+  <style>
+    body {
+      background-color: black;
+      color: white;
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+    #chat-box {
+      height: 300px;
+      overflow-y: auto;
+      border: 2px solid #00ffff;
+      padding: 10px;
+      margin-bottom: 10px;
+      background-color: #111;
+    }
+    #chat-box p {
+      margin: 4px 0;
+    }
+    input, button {
+      padding: 10px;
+      margin-top: 5px;
+      font-size: 16px;
+    }
+  </style>
+</head>
+<body>
+  <h2>Chat en Vivo - MedalloVIP</h2>
+  <div id="chat-box"></div>
+  <input type="text" id="username" placeholder="Tu nombre" />
+  <br />
+  <input type="text" id="message" placeholder="Escribe tu mensaje" />
+  <br />
+  <button onclick="sendMessage()">Enviar</button>
+
+  <script type="module" src="./firebase-config.js"></script>
+  <script type="module">
+    import { getDatabase, ref, push, onChildAdded } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+    import { app } from "./firebase-config.js";
+
+    const db = getDatabase(app);
+    const messagesRef = ref(db, "mensajes");
+
+    const chatBox = document.getElementById("chat-box");
+
+    onChildAdded(messagesRef, (data) => {
+      const msg = data.val();
+      const p = document.createElement("p");
+      p.innerText = `${msg.name}: ${msg.text}`;
+      chatBox.appendChild(p);
+      chatBox.scrollTop = chatBox.scrollHeight;
+    });
+
+    window.sendMessage = function () {
+      const name = document.getElementById("username").value;
+      const text = document.getElementById("message").value;
+      if (name && text) {
+        push(messagesRef, { name, text });
+        document.getElementById("message").value = "";
+      }
+    };
+  </script>
+</body>
+</html>
