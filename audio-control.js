@@ -1,21 +1,20 @@
-// audio-control.js
+let micEnabled = true;
+let audioTrack = null;
 
-export let audioTrack = null;
-export let micEnabled = true;
+export function inicializarMicrofono(tracks, btnMic) {
+  audioTrack = tracks.find(t => t.kind === 'audio');
 
-export function setAudioTrack(track) {
-  audioTrack = track;
-}
+  if (audioTrack) {
+    btnMic.onclick = () => {
+      micEnabled = !micEnabled;
+      audioTrack.muted = !micEnabled;
 
-export function toggleMic(button) {
-  if (!audioTrack) {
-    console.warn("No hay pista de audio disponible");
-    return;
+      btnMic.textContent = micEnabled ? "Silenciar Micrófono" : "Activar Micrófono";
+      btnMic.style.backgroundColor = micEnabled ? "#ff00ff" : "#ff3333";
+    };
+  } else {
+    console.warn("No se encontró pista de audio.");
+    btnMic.disabled = true;
+    btnMic.textContent = "Micrófono no disponible";
   }
-
-  micEnabled = !micEnabled;
-  audioTrack.muted = !micEnabled;
-
-  button.textContent = micEnabled ? "Silenciar Micrófono" : "Activar Micrófono";
-  button.style.backgroundColor = micEnabled ? "#ff00ff" : "#ff3333";
 }
