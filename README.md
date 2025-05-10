@@ -3,93 +3,122 @@ Plataforma de trasmisiones en vivo
 # MedalloVIP - Plataforma de Streaming y Economía Digital
 
 ## Descripción General
-MedalloVIP es una plataforma de entretenimiento en vivo que combina transmisiones en tiempo real, interacción con IA, sistema tokenizado, control de usuarios y un ecosistema completo de herramientas para modelos, usuarios y administradores.
+**MedalloVIP** es una plataforma de entretenimiento en vivo de última generación. Combina transmisiones en tiempo real, interacción con inteligencia artificial, economía tokenizada y una arquitectura modular diseñada para escalabilidad, rendimiento y seguridad.  
+Ideal para modelos, usuarios y administradores dentro de un ecosistema interactivo, moderno y autónomo.
 
 ---
 
 ## Arquitectura del Proyecto
 
-### HTML
-- `transmitir.html` → Vista de emisión para modelos.
-- `ver-transmision.html` → Vista de observación para usuarios.
-- `chat.html` → Chat externo o adicional.
-- `perfil.html` → Configuración y visualización del perfil.
+### HTML (Interfaz)
+- `transmitir.html` – Vista del modelo para emitir en vivo.
+- `ver-transmision.html` – Sala del usuario para ver transmisiones.
+- `chat.html` – Módulo de chat independiente o incrustable.
+- `perfil.html` – Vista del perfil editable por el usuario o modelo.
 
 ---
 
-### JavaScript (Controladores Modulares)
+### JavaScript (Módulos Funcionales)
 
-- `transmision-control.js` → Encargado de iniciar, detener y controlar la transmisión.
-- `tokens-control.js` → Manejo de propinas, saldo y metas.
-- `chat-control.js` → Envío y recepción de mensajes en vivo.
-- `c2c-control.js` → Activación de cámara del usuario (modo privado).
-- `audio-control.js` → Activar/silenciar micrófono.
-- `velocidad-control.js` → Muestra la velocidad de conexión.
-- `resolucion-control.js` → Muestra la calidad de resolución del stream.
-- `modo-control.js` → Alterna entre modo oscuro/claro.
-- `perfil-control.js` → Permite configurar nombre, descripción, imagen, etc.
-- `melizza-ai.js` → Integra la IA asistente (voz, respuestas y acompañamiento).
-- `reacciones-control.js` → Controla animaciones y efectos en el chat.
-- `bots-chat-control.js` → Mensajes automáticos, comandos, bienvenida.
-- `marketing-control.js` → Herramientas de promoción, referidos, enlaces.
-- `clubfans-control.js` → Sistema de suscripciones premium por niveles.
-- `ranking-control.js` → Muestra top modelos y usuarios destacados.
-- `reportes-control.js` → Manejo de reportes y alertas de usuarios.
-- `moderacion-control.js` → Control de comportamiento y bloqueo.
-- `traduccion-control.js` → Traducción automática en tiempo real.
-- `metas-control.js` → Objetivos de tokens, animaciones de progreso.
-- `notificaciones-control.js` → Alertas en pantalla.
-- `eventos-control.js` → Sistema de sorteos, concursos o promociones.
-- `backup-control.js` → Sincronización y respaldo de datos.
-- `inventario-control.js` → Gestión de galería, productos o regalos.
-- `galeria-control.js` → Visualizador de fotos o contenido multimedia.
-- `soporte-control.js` → Módulo de contacto o ayuda.
-- `seguridad-control.js` → Detección de capturas, grabaciones o accesos.
+#### Núcleo
+- `transmision-control.js` – Inicia/detiene stream, conecta con LiveKit.
+- `firebase-config.js` – Autenticación y base de datos en tiempo real.
+- `livekit-config.js` – Conexión WebRTC a salas privadas.
+
+#### Interacción y Comunicación
+- `chat-control.js` – Envío, recepción y moderación del chat en vivo.
+- `c2c-control.js` – Activación de cámara del cliente (modo privado).
+- `melizza-ai.js` – Asistente con IA: voz, texto, compañía y guía.
+
+#### Audio / Visual
+- `audio-control.js` – Silenciar, activar o cambiar dispositivos.
+- `velocidad-control.js` – Monitoreo de conexión del usuario.
+- `resolucion-control.js` – Detección y visualización de calidad de stream.
+- `modo-control.js` – Alternancia entre modo oscuro / claro.
+
+#### Economía y Tokens
+- `tokens-control.js` – Gestión de tokens, propinas y saldos.
+- `historial-tokens.js` – Registro de envíos y retiros.
+- `economia-config.js` – Configuración de reglas y comisiones.
+
+#### Engagement y Comunidad
+- `ranking-control.js` – Clasificaciones en tiempo real.
+- `reacciones-control.js` – Animaciones y efectos visuales.
+- `metas-control.js` – Visualización de objetivos y progreso.
+- `clubfans-control.js` – Suscripciones premium y beneficios.
+- `rewards-control.js` – Bonificaciones y premios por actividad.
+- `reportes-control.js` – Sistema de alertas y reclamos.
+- `moderacion-control.js` – Moderadores, baneo y filtrado.
+
+#### Automatización e IA
+- `bots-chat-control.js` – Mensajes automáticos, comandos y alertas.
+- `traduccion-control.js` – Traducción automática del chat.
+- `notificaciones-control.js` – Alertas visuales y de sistema.
+
+#### Administración
+- `perfil-control.js` – Edición de datos, imagen, biografía.
+- `seguridad-control.js` – Captura de intentos maliciosos o grabación.
+- `backup-control.js` – Respaldos automáticos.
+- `configuracion-control.js` – Preferencias, ajustes y entorno.
+
+#### Extras y UX
+- `galeria-control.js` – Visualización de contenido multimedia.
+- `inventario-control.js` – Control de productos o regalos virtuales.
+- `eventos-control.js` – Gestión de sorteos, promociones, shows especiales.
+- `soporte-control.js` – Módulo de ayuda y contacto con soporte.
+- `marketing-control.js` – Referidos, promociones, banners.
+- `analytics-control.js` – Estadísticas internas.
+- `integraciones-control.js` – API externas, pagos, herramientas de terceros.
+- `verificacion-control.js` – Verificación de identidad de modelos/usuarios.
+- `medallas-control.js` – Sistema de logros y recompensas visuales.
+- `logs-control.js` – Registro de actividad y errores del sistema.
 
 ---
 
-### Configuración
-- `firebase-config.js` → Autenticación, base de datos y almacenamiento.
-- `economia-config.js` → Comisiones, porcentajes y reglas del sistema económico.
-- `livekit-config.js` → Conexión al servidor WebRTC.
-- `ui-elements.css` → Estilos generales (futuristas, glassmorphism).
+### CSS y Diseño
+
+- `ui-elements.css` – Componentes visuales, glassmorphism y neon style.
 
 ---
 
 ## Flujo General
 
-1. El modelo inicia sesión y accede a `transmitir.html`.
-2. Se conecta a la sala LiveKit y transmite en vivo.
-3. Los usuarios acceden a `ver-transmision.html`, ven el show y envían tokens.
-4. Chat en tiempo real, animaciones, propinas, ranking y metas se actualizan.
-5. La IA Melizza asiste en todo momento con voz y texto.
-6. Toda la economía queda registrada y auditada.
+1. El modelo accede a `transmitir.html` y comienza a emitir.
+2. Usuarios acceden a `ver-transmision.html` y participan con tokens, chat y C2C.
+3. La IA Melizza guía al usuario, modera el chat y personaliza la experiencia.
+4. El sistema actualiza metas, rankings, historial y economía en tiempo real.
+5. Toda interacción queda registrada para respaldo, estadísticas y seguridad.
 
 ---
 
-## Dependencias
-- LiveKit (transmisión)
-- Firebase (base de datos, login)
-- OpenAI (IA Melizza)
-- Vercel (despliegue)
-- CSS personalizado (Glassmorphism, DarkMode, etc.)
+## Dependencias Técnicas
+
+- [LiveKit](https://livekit.io/) – WebRTC en tiempo real.
+- [Firebase](https://firebase.google.com/) – Login, base de datos, almacenamiento.
+- [OpenAI](https://openai.com/) – Asistente Melizza (voz/texto).
+- [Vercel](https://vercel.com/) – Deploy instantáneo y escalable.
+- Custom CSS – Glassmorphism, neon UI, dark/light modes.
 
 ---
 
 ## Créditos
 
-- Fundador: **David Alejandro Castrillón Díaz**
-- Arquitectura: **Livia AI**
-- Proyecto: **MedalloVIP**
+- **Fundador:** David Alejandro Castrillón Díaz  
+- **Arquitectura & IA:** Livia  
+- **Proyecto:** MedalloVIP  
+- **Ubicación del repositorio:** [Repositorio oficial en GitHub]
 
 ---
 
 ## Próximos pasos
 
-1. Terminar instalación de los módulos base.
-2. Implementar `melizza-ai.js`, `tokens-control.js`, `chat-control.js`.
-3. Verificar rendimiento, conexión y comportamiento.
+1. Activar `firebase-config.js`, `livekit-config.js` y `melizza-ai.js`.
+2. Iniciar la integración de módulos por orden funcional: audio → transmisión → tokens → chat.
+3. Testeo cruzado y pruebas de carga.
+4. Escalamiento y marketing global.
 
 ---
 
-Este archivo debe llamarse `README.md` y dejarse en la raíz de tu repositorio. ¿Quieres que sigamos ahora con el primer módulo funcional base, como `tokens-control.js` o `melizza-ai.js`? ¿O prefieres empezar por el chat?
+## Licencia
+
+Proyecto privado y registrado. Prohibida su copia, reproducción o comercialización sin autorización de los fundadores.
